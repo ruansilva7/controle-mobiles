@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, jsonify, send_from_directory
 from werkzeug.utils import secure_filename
 from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
 import sqlite3
 import json
 import uuid
@@ -126,21 +128,37 @@ def criar_entrega():
 
     arquivo.save(UPLOADS / filename)
 
+    # Horário oficial de Recife
+    data_entrega = datetime.now(
+        ZoneInfo("America/Recife")
+    ).isoformat(timespec="seconds")
+
     try:
         with get_db() as db:
             cur = db.execute(
                 """
-                INSERT INTO entregas (nome, documento_path)
-                VALUES (?, ?)
+                INSERT INTO entregas (
+                    nome,
+                    documento_path,
+                    data_entrega
+                )
+                VALUES (?, ?, ?)
                 """,
-                (nome, relpath)
+                (
+                    nome,
+                    relpath,
+                    data_entrega
+                )
             )
 
             entrega_id = cur.lastrowid
 
             db.executemany(
                 """
-                INSERT INTO mobiles (entrega_id, numero)
+                INSERT INTO mobiles (
+                    entrega_id,
+                    numero
+                )
                 VALUES (?, ?)
                 """,
                 [
@@ -189,7 +207,10 @@ def buscar():
                 ) AS total_retiradas,
 
                 (
-                    SELECT GROUP_CONCAT(m2.numero, '||')
+                    SELECT GROUP_CONCAT(
+                        m2.numero,
+                        '||'
+                    )
                     FROM mobiles m2
                     WHERE m2.entrega_id = e.id
                 ) AS mobiles
@@ -201,7 +222,9 @@ def buscar():
 
             WHERE m.numero = ?
 
-            ORDER BY e.data_entrega DESC, e.id DESC
+            ORDER BY
+                e.data_entrega DESC,
+                e.id DESC
             """,
             (numero,)
         ).fetchall()
@@ -224,7 +247,10 @@ def buscar():
 
 @app.get("/uploads/<path:filename>")
 def uploads(filename):
-    return send_from_directory(UPLOADS, filename)
+    return send_from_directory(
+        UPLOADS,
+        filename
+    )
 
 
 # Inicializa o banco sempre que o aplicativo for carregado
