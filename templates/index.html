@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Controle de Mobiles</title>
+<style>
+:root{
+  --red:#c8102e;
+  --red-dark:#a90024;
+  --navy:#0f1b2d;
+  --navy-2:#16243a;
+  --text:#17202a;
+  --muted:#687789;
+  --bg:#f4f6f9;
+  --card:#ffffff;
+  --border:#dce2e9;
+  --soft:#fff1f4;
+  --success:#159447;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Inter,Arial,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+button,input{font:inherit}
+button{cursor:pointer}
+.app{min-height:100vh;display:flex}
+.sidebar{
+  width:270px;background:linear-gradient(180deg,var(--navy),#0c1728);
+  color:#fff;position:fixed;left:0;top:0;bottom:0;padding:24px 16px;
+  display:flex;flex-direction:column;z-index:20;
+}
+.brand{display:flex;align-items:center;gap:12px;padding:4px 8px 26px;border-bottom:1px solid #ffffff18}
+.brand-icon{width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#fff 0%,#f3f5f8 100%);color:var(--red);display:grid;place-items:center;font-size:20px;font-weight:900;letter-spacing:-1px;box-shadow:0 6px 18px #0002}.brand-icon span{display:block;transform:skew(-7deg)}
+.brand h1{font-size:18px;margin:0 0 4px}.brand p{font-size:12px;color:#c8d0db;margin:0}
+.nav{margin-top:22px}.nav-title{font-size:11px;color:#9da8b7;text-transform:uppercase;letter-spacing:1px;margin:24px 10px 10px}
+.nav button{width:100%;border:0;background:transparent;color:#e9edf3;text-align:left;padding:13px 12px;border-radius:10px;margin-bottom:5px;font-weight:600}
+.nav button:hover,.nav button.active{background:var(--red);color:#fff}
+.nav-icon{display:inline-block;width:26px;font-size:19px}
+.sidebar-footer{margin-top:auto;background:#17253a;border:1px solid #ffffff0d;border-radius:12px;padding:14px;font-size:12px;color:#d5dce6}
+.sidebar-footer strong{display:block;font-size:13px;margin-bottom:4px}
+.main{margin-left:270px;width:calc(100% - 270px);min-width:0}
+.topbar{height:86px;background:linear-gradient(90deg,var(--red),#bd0027);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 34px}
+.menu-btn{background:transparent;color:#fff;border:0;font-size:25px;display:none}
+.date{text-align:right;font-size:13px;line-height:1.5}.date strong{font-size:14px}
+.content{padding:26px;max-width:1320px;margin:auto}
+.card{background:var(--card);border:1px solid #e8ebef;border-radius:16px;padding:24px;margin-bottom:20px;box-shadow:0 5px 22px #1322380b}
+.section-head{display:flex;align-items:center;gap:13px;margin-bottom:18px}
+.section-icon{width:44px;height:44px;border-radius:50%;background:var(--soft);display:grid;place-items:center;color:var(--red);font-size:22px}
+.section-head h2{margin:0;font-size:20px}.section-head p{margin:4px 0 0;color:var(--muted);font-size:14px}
+.search-row{display:grid;grid-template-columns:1fr auto auto;gap:10px}
+input[type=text],input[type=file]{
+  width:100%;padding:14px 16px;border:1px solid #cfd7e1;border-radius:10px;
+  outline:none;background:#fff;color:var(--text);font-size:15px
+}
+input:focus{border-color:var(--red);box-shadow:0 0 0 3px #c8102e14}
+.file-input{padding:10px 12px!important}
+.primary,.secondary{
+  border-radius:10px;padding:13px 20px;font-weight:700;border:1px solid transparent;
+}
+.primary{background:var(--red);color:#fff}.primary:hover{background:var(--red-dark)}
+.secondary{background:#fff;color:#173b63;border-color:#d5dce5}.secondary:hover{background:#f5f7fa}
+.result-placeholder{display:flex;align-items:center;gap:15px;min-height:92px}
+.result-placeholder .big-icon{font-size:42px;opacity:.22}
+.result-placeholder h2{margin:0 0 5px;font-size:18px}.result-placeholder p{margin:0;color:var(--muted)}
+.result-layout{display:grid;grid-template-columns:1.15fr .85fr;gap:20px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr 0.75fr;gap:12px}
+.field label{display:block;font-size:13px;font-weight:700;margin:0 0 7px}
+.upload-preview{border:1px solid var(--border);border-radius:10px;padding:12px;margin-top:10px;display:flex;align-items:center;gap:12px;background:#fafbfc}
+.upload-preview .thumb{width:58px;height:58px;border-radius:8px;object-fit:cover;background:#edf1f5;display:grid;place-items:center;font-size:22px}
+.upload-preview .file-name{font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.upload-preview .file-size{font-size:12px;color:var(--muted);margin-top:4px}
+.form-actions{margin-top:18px}
+.form-actions .primary{width:100%;padding:15px}
+.security{margin-top:12px;color:var(--muted);font-size:12px}
+.mobile-fields{margin-top:14px;padding:14px;border:1px solid var(--border);border-radius:11px;background:#fafbfc}
+.mobile-fields-title{font-size:13px;font-weight:700;margin-bottom:10px}
+.mobile-field{display:flex;align-items:center;gap:9px;margin-bottom:9px}
+.mobile-field:last-child{margin-bottom:0}
+.mobile-number{width:100%;padding:11px 13px!important}
+.mobile-index{min-width:30px;height:30px;border-radius:50%;background:var(--soft);color:var(--red);display:grid;place-items:center;font-size:12px;font-weight:800}
+.mobile-hint{font-size:12px;color:var(--muted);margin-top:9px}
+.detail-card h3{margin:0;font-size:18px}
+.status{margin-left:auto;background:#e2f7eb;color:var(--success);border-radius:20px;padding:7px 12px;font-size:12px;font-weight:700}
+.detail-head{display:flex;align-items:center;margin-bottom:12px}
+.detail-list{border:1px solid #e1e6ec;border-radius:11px;overflow:hidden}
+.detail-row{display:flex;align-items:center;gap:12px;padding:13px;border-bottom:1px solid #e7ebef}.detail-row:last-child{border-bottom:0}
+.detail-row .ico{width:34px;height:34px;border-radius:50%;background:var(--soft);display:grid;place-items:center;color:var(--red)}
+.detail-row small{display:block;color:var(--muted);font-size:12px}.detail-row strong{display:block;margin-top:3px;font-size:14px}
+.document{margin-top:16px}
+.document-title{font-size:13px;color:var(--muted);margin-bottom:8px}
+.doc-box{border:1px solid var(--border);border-radius:10px;padding:11px;display:flex;align-items:center;gap:11px}
+.doc-thumb{width:52px;height:52px;border-radius:7px;object-fit:cover;background:#edf1f5}
+.doc-info{min-width:0;flex:1}.doc-info strong{display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.doc-info span{font-size:12px;color:var(--muted)}
+.view-btn{width:40px;height:40px;border:1px solid var(--red);background:#fff;color:var(--red);border-radius:8px;font-size:18px}
+.full-view{width:100%;margin-top:10px}
+.empty-result{padding:4px 0}
+.history-note{color:var(--muted);font-size:12px;margin-top:10px}
+.msg{font-size:13px;font-weight:700;margin:12px 0 0}
+.modal{display:none;position:fixed;inset:0;background:#07101dcc;align-items:center;justify-content:center;padding:18px;z-index:100}
+.modal-content{background:#fff;border-radius:16px;padding:22px;width:min(760px,100%);max-height:92vh;overflow:auto}
+.close{float:right;background:#eef1f5;border:0;border-radius:8px;padding:7px 11px}
+.modal img{max-width:100%;max-height:68vh;display:block;margin:15px auto;border-radius:10px}
+.modal iframe{width:100%;height:68vh;border:0;margin-top:15px;border-radius:8px}
+a{color:var(--red);font-weight:700}
+@media(max-width:1000px){
+  .sidebar{width:225px}.main{margin-left:225px;width:calc(100% - 225px)}
+  .result-layout{grid-template-columns:1fr}
+}
+@media(max-width:760px){
+  .sidebar{display:none}.main{margin-left:0;width:100%}
+  .menu-btn{display:block}.topbar{height:70px;padding:0 18px}.content{padding:16px}
+  .search-row{grid-template-columns:1fr 1fr}.search-row input{grid-column:1/-1}
+  .form-grid{grid-template-columns:1fr}.card{padding:18px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-icon"><span>CB</span></div>
+    <div>
+      <h1>Controle de Mobiles</h1>
+      <p>Consulta e registro de entrega</p>
+    </div>
+  </div>
+
+  <nav class="nav">
+    <button type="button" class="active" id="navPesquisar"><span class="nav-icon">⌕</span> Pesquisar</button>
+    <button type="button" id="navNovaEntrega"><span class="nav-icon">⊕</span> Nova entrega</button>
+    <div class="nav-title">Geral</div>
+    <button><span class="nav-icon">▥</span> Relatórios</button>
+    <button><span class="nav-icon">◷</span> Histórico</button>
+    <button><span class="nav-icon">♙</span> Usuários</button>
+  </nav>
+
+  <div class="sidebar-footer">
+    <strong>🛡️ Sistema conectado</strong>
+    Dados armazenados localmente em SQLite.
+  </div>
+</aside>
+
+<section class="main">
+  <header class="topbar">
+    <button class="menu-btn">☰</button>
+    <div></div>
+    <div class="date"><strong id="currentDate"></strong><br><span id="currentTime"></span></div>
+  </header>
+
+  <main class="content">
+
+    <section class="card">
+      <div class="section-head">
+        <div class="section-icon">⌕</div>
+        <div>
+          <h2>Pesquisar Mobile</h2>
+          <p>Digite o número do mobile para consultar a entrega</p>
+        </div>
+      </div>
+
+      <div class="search-row">
+        <input id="search" type="text" placeholder="Digite o número do mobile" onkeydown="if(event.key==='Enter') buscar()">
+        <button type="button" class="primary" id="btnBuscar">⌕ &nbsp; Pesquisar</button>
+        <button type="button" class="secondary" id="btnLimpar">× &nbsp; Limpar</button>
+      </div>
+    </section>
+
+    <section id="result" class="card">
+      <div class="result-placeholder">
+        <div class="big-icon">▣</div>
+        <div>
+          <h2>Resultado da consulta</h2>
+          <p>Pesquise um número de mobile para ver os detalhes da entrega.</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="result-layout">
+
+      <section class="card">
+        <div class="section-head">
+          <div class="section-icon">＋</div>
+          <div>
+            <h2>Adicionar entrega</h2>
+            <p>Informe os dados da retirada e envie a foto/scan do documento assinado.</p>
+          </div>
+        </div>
+
+        <div class="form-grid" style="grid-template-columns:1.25fr 0.75fr">
+          <div class="field">
+            <label>Nome do responsável</label>
+            <input id="nome" type="text" placeholder="Nome completo">
+          </div>
+          <div class="field">
+            <label>Quantidade de mobiles</label>
+            <input id="quantidade" type="number" min="1" max="50" step="1" value="1" placeholder="Ex.: 2">
+          </div>
+        </div>
+
+        <div class="field" style="margin-top:14px">
+          <label>Foto/scan do documento assinado</label>
+          <input id="foto" class="file-input" type="file" accept="image/*,.pdf" capture="environment">
+        </div>
+
+        <div class="mobile-fields">
+          <div class="mobile-fields-title">📱 Números dos mobiles</div>
+          <div id="mobileInputs"></div>
+          <div class="mobile-hint">Informe o número de identificação de cada mobile retirado. A quantidade define quantos campos serão exibidos.</div>
+        </div>
+
+        <div id="fileInfo"></div>
+
+        <div class="form-actions">
+          <button type="button" class="primary" id="btnAdicionar">☁ &nbsp; Adicionar entrega</button>
+        </div>
+
+        <div class="security">🔒 O arquivo será armazenado no Supabase Storage.</div>
+        <p id="msg" class="msg"></p>
+      </section>
+
+      <section class="card detail-card">
+        <div class="detail-head">
+          <h3>Detalhes da entrega</h3>
+          <span class="status">Aguardando consulta</span>
+        </div>
+
+        <div id="detailContent">
+          <div class="detail-list">
+            <div class="detail-row">
+              <div class="ico">▣</div>
+              <div><small>Mobile consultado</small><strong>—</strong></div>
+            </div>
+            <div class="detail-row">
+              <div class="ico">♙</div>
+              <div><small>Responsável</small><strong>—</strong></div>
+            </div>
+            <div class="detail-row">
+              <div class="ico">▯</div>
+              <div><small>Total de mobiles retirados</small><strong>—</strong></div>
+            </div>
+            <div class="detail-row">
+              <div class="ico">▣</div>
+              <div><small>Data da última entrega</small><strong>—</strong></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</section>
+</div>
+
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <button type="button" class="close" id="btnFechar">✕</button>
+    <h2>📄 Documento da entrega</h2>
+    <div id="modalInfo"></div>
+    <div id="arquivoVisual"></div>
+  </div>
+</div>
+
+<script>
+
+/* CONFIGURAÇÃO LOCAL */
+let atual = null;
+const quantidadeInput = document.getElementById("quantidade");
+const mobileInputs = document.getElementById("mobileInputs");
+const fotoInput = document.getElementById("foto");
+/* ==========================================================
+   BOTÕES — TODOS LIGADOS DIRETAMENTE PELO JAVASCRIPT
+   ========================================================== */
+document.getElementById("btnBuscar").addEventListener("click", buscar);
+document.getElementById("btnLimpar").addEventListener("click", limparBusca);
+document.getElementById("btnAdicionar").addEventListener("click", adicionar);
+document.getElementById("btnFechar").addEventListener("click", fechar);
+
+document.getElementById("navPesquisar").addEventListener("click", function(){
+  document.getElementById("search").focus();
+  window.scrollTo({top:0, behavior:"smooth"});
+});
+
+document.getElementById("navNovaEntrega").addEventListener("click", function(){
+  document.getElementById("nome").focus();
+  document.getElementById("nome").scrollIntoView({behavior:"smooth", block:"center"});
+});
+
+document.getElementById("result").addEventListener("click", function(event){
+  if(event.target.closest("[data-action='documento']")) verDocumento();
+});
+
+document.querySelector(".detail-card").addEventListener("click", function(event){
+  if(event.target.closest("[data-action='documento']")) verDocumento();
+});
+
+document.getElementById("modal").addEventListener("click", function(event){
+  if(event.target.id === "modal") fechar();
+});
+
+/* ==========================================================
+   CAMPOS DOS MOBILES
+   ========================================================== */
+quantidadeInput.addEventListener("input", gerarCamposMobiles);
+gerarCamposMobiles();
+
+function gerarCamposMobiles(){
+  let quantidade = Number(quantidadeInput.value);
+
+  if(!Number.isInteger(quantidade) || quantidade < 1){
+    quantidade = 1;
+    quantidadeInput.value = 1;
+  }
+
+  if(quantidade > 50){
+    quantidade = 50;
+    quantidadeInput.value = 50;
+  }
+
+  const valoresAtuais = Array.from(
+    mobileInputs.querySelectorAll(".mobile-number")
+  ).map(input => input.value);
+
+  mobileInputs.innerHTML = "";
+
+  for(let i = 0; i < quantidade; i++){
+    const wrapper = document.createElement("div");
+    wrapper.className = "mobile-field";
+
+    const index = document.createElement("span");
+    index.className = "mobile-index";
+    index.textContent = i + 1;
+
+    const input = document.createElement("input");
+    input.className = "mobile-number";
+    input.type = "text";
+    input.inputMode = "numeric";
+    input.placeholder = "Número do mobile " + (i + 1);
+    input.value = valoresAtuais[i] || "";
+
+    wrapper.appendChild(index);
+    wrapper.appendChild(input);
+    mobileInputs.appendChild(wrapper);
+  }
+}
+
+function obterNumerosMobiles(){
+  return Array.from(document.querySelectorAll(".mobile-number"))
+    .map(input => normalizarPulsus(input.value));
+}
+
+/* ==========================================================
+   ARQUIVO / PRÉVIA
+   ========================================================== */
+fotoInput.addEventListener("change", function(){
+  const arquivo = this.files[0];
+  const info = document.getElementById("fileInfo");
+
+  if(!arquivo){
+    info.innerHTML = "";
+    return;
+  }
+
+  const tamanho = formatarTamanho(arquivo.size);
+
+  if(arquivo.type.startsWith("image/")){
+    const url = URL.createObjectURL(arquivo);
+    info.innerHTML = `
+      <div class="upload-preview">
+        <img class="thumb" src="${escapeAttribute(url)}" alt="Prévia">
+        <div>
+          <div class="file-name">${escapeHtml(arquivo.name)}</div>
+          <div class="file-size">${escapeHtml(arquivo.type || "Imagem")} • ${tamanho}</div>
+        </div>
+      </div>`;
+  }else{
+    info.innerHTML = `
+      <div class="upload-preview">
+        <div class="thumb">📄</div>
+        <div>
+          <div class="file-name">${escapeHtml(arquivo.name)}</div>
+          <div class="file-size">PDF • ${tamanho}</div>
+        </div>
+      </div>`;
+  }
+});
+
+/* ==========================================================
+   ADICIONAR ENTREGA
+   ========================================================== */
+async function adicionar(){
+  const nome = document.getElementById("nome").value.trim();
+  const quantidade = Number(quantidadeInput.value);
+  const numeros = obterNumerosMobiles();
+  const arquivo = fotoInput.files[0];
+  const msg = document.getElementById("msg");
+  const btn = document.getElementById("btnAdicionar");
+
+  if(!nome){ msg.innerText="⚠️ Informe o nome do responsável."; document.getElementById("nome").focus(); return; }
+  if(!Number.isInteger(quantidade) || quantidade < 1){ msg.innerText="⚠️ Informe uma quantidade válida."; return; }
+  if(numeros.length !== quantidade || numeros.some(n => !n)){ msg.innerText=`⚠️ Informe o número de todos os ${quantidade} mobile(s).`; return; }
+  if(new Set(numeros).size !== numeros.length){ msg.innerText="⚠️ Não repita o mesmo número de mobile nesta entrega."; return; }
+  if(!arquivo){ msg.innerText="⚠️ Selecione a foto/scan do documento."; return; }
+
+  btn.disabled=true; btn.innerText="Salvando..."; msg.innerText="";
+  try{
+    const form = new FormData();
+    form.append("nome", nome);
+    form.append("quantidade", String(quantidade));
+    form.append("numeros", JSON.stringify(numeros));
+    form.append("documento", arquivo);
+    const response = await fetch("/api/entregas", {method:"POST", body:form});
+    const data = await response.json();
+    if(!response.ok) throw new Error(data.error || "Não foi possível salvar.");
+    msg.innerText=`✅ Entrega adicionada! ${quantidade} mobile(s) registrado(s).`;
+    document.getElementById("nome").value=""; quantidadeInput.value="1"; gerarCamposMobiles(); fotoInput.value=""; document.getElementById("fileInfo").innerHTML="";
+  }catch(error){ console.error(error); msg.innerText="❌ " + error.message; }
+  finally{ btn.disabled=false; btn.innerText="☁  Adicionar entrega"; }
+}
+
+/* ==========================================================
+   PESQUISAR MOBILE
+   ========================================================== */
+async function buscar(){
+  const q = normalizarPulsus(document.getElementById("search").value);
+  const result = document.getElementById("result");
+  const btn = document.getElementById("btnBuscar");
+  if(!q){ result.innerHTML=`<div class="empty-result"><b>⚠️ Digite um número de mobile.</b></div>`; atualizarDetalhes(null); return; }
+  btn.disabled=true; btn.innerText="Pesquisando..."; result.innerHTML=`<div class="empty-result">🔎 Consultando o banco de dados...</div>`;
+  try{
+    const response=await fetch(`/api/entregas/buscar?numero=${encodeURIComponent(q)}`);
+    const data=await response.json();
+    if(!response.ok) throw new Error(data.error || "Erro na consulta.");
+    if(!data || data.length===0){ atual=null; result.innerHTML=`<div class="empty-result"><b>❌ Nenhuma entrega encontrada.</b><p style="color:var(--muted)">Não encontramos registros para o mobile <b>${escapeHtml(q)}</b>.</p></div>`; atualizarDetalhes(null); return; }
+    const ultimo=data[0]; atual=ultimo;
+    result.innerHTML=`<div class="section-head" style="margin-bottom:12px"><div class="section-icon">✓</div><div><h2>Resultado da consulta</h2><p>Mobile ${escapeHtml(q)} encontrado no cadastro.</p></div></div><div class="history-note">${data.length} retirada(s) encontrada(s) para este mobile.</div>`;
+    atualizarDetalhes({pulsus:q,nome:ultimo.nome,quantidade:data.length,numerosMobiles:ultimo.mobiles,data:ultimo.data_entrega,path:ultimo.documento_path,entregaId:ultimo.entrega_id});
+  }catch(error){ result.innerHTML=`<div class="empty-result"><b>❌ Erro ao consultar o banco.</b><p style="color:var(--muted)">${escapeHtml(error.message||"")}</p></div>`; atualizarDetalhes(null); }
+  finally{ btn.disabled=false; btn.innerText="⌕  Pesquisar"; }
+}
+
+/* ==========================================================
+   DETALHES
+   ========================================================== */
+function atualizarDetalhes(info){
+  const detail = document.getElementById("detailContent");
+  const card = document.querySelector(".status");
+
+  if(!info){
+    card.innerText = "Aguardando consulta";
+    card.style.background = "#eef1f5";
+    card.style.color = "#687789";
+
+    detail.innerHTML = `
+      <div class="detail-list">
+        <div class="detail-row"><div class="ico">▣</div><div><small>Mobile consultado</small><strong>—</strong></div></div>
+        <div class="detail-row"><div class="ico">♙</div><div><small>Responsável</small><strong>—</strong></div></div>
+        <div class="detail-row"><div class="ico">▯</div><div><small>Total de retiradas</small><strong>—</strong></div></div>
+        <div class="detail-row"><div class="ico">▣</div><div><small>Data da última entrega</small><strong>—</strong></div></div>
+      </div>`;
+    return;
+  }
+
+  card.innerText = "Entregue";
+  card.style.background = "#e2f7eb";
+  card.style.color = "#159447";
+
+  const url = getPublicUrl(info.path);
+  const isPdf = (info.path || "").toLowerCase().endsWith(".pdf");
+
+  detail.innerHTML = `
+    <div class="detail-list">
+      <div class="detail-row"><div class="ico">▣</div><div><small>Mobile consultado</small><strong>${escapeHtml(info.pulsus)}</strong></div></div>
+      <div class="detail-row"><div class="ico">♙</div><div><small>Responsável</small><strong>${escapeHtml(info.nome)}</strong></div></div>
+      <div class="detail-row"><div class="ico">▯</div><div><small>Total de retiradas deste mobile</small><strong>${info.quantidade}</strong></div></div>
+      <div class="detail-row"><div class="ico">▣</div><div><small>Data da última entrega</small><strong>${formatarData(info.data)}</strong></div></div>
+    </div>
+
+    <div class="mobile-fields">
+      <div class="mobile-fields-title">📱 Mobiles desta entrega</div>
+      ${(info.numerosMobiles||[info.pulsus]).map((n,i)=>`<div class="mobile-field"><span class="mobile-index">${i+1}</span><input class="mobile-number" type="text" value="${escapeAttribute(n)}" readonly></div>`).join("")}
+    </div>
+
+    <div class="document">
+      <div class="document-title">Documento assinado</div>
+      <div class="doc-box">
+        ${isPdf
+          ? '<div class="doc-thumb" style="display:grid;place-items:center;font-size:25px">📄</div>'
+          : `<img class="doc-thumb" src="${escapeAttribute(url)}" alt="Documento">`
+        }
+        <div class="doc-info">
+          <strong>${escapeHtml((info.path || "").split("/").pop() || "Documento")}</strong>
+          <span>${isPdf ? "PDF" : "Imagem"}</span>
+        </div>
+        <button type="button" class="view-btn" data-action="documento" title="Visualizar">◉</button>
+      </div>
+      <button type="button" class="secondary full-view" data-action="documento">↗ &nbsp; Visualizar documento</button>
+    </div>`;
+}
+
+function getPublicUrl(path){ return path ? "/uploads/" + path.split("/").map(encodeURIComponent).join("/") : ""; }
+
+/* ==========================================================
+   DOCUMENTO
+   ========================================================== */
+function verDocumento(){
+  if(!atual || !atual.documento_path) return;
+  const modal=document.getElementById("modal"), info=document.getElementById("modalInfo"), visual=document.getElementById("arquivoVisual");
+  info.innerHTML=`<p><b>Mobile:</b> ${escapeHtml(atual.pulsus)}</p><p><b>Responsável:</b> ${escapeHtml(atual.nome)}</p><p><b>Data:</b> ${formatarData(atual.data_entrega)}</p>`;
+  const url=getPublicUrl(atual.documento_path), caminho=atual.documento_path.toLowerCase();
+  visual.innerHTML=caminho.endsWith(".pdf") ? `<iframe src="${escapeAttribute(url)}"></iframe><p><a href="${escapeAttribute(url)}" target="_blank" rel="noopener">Abrir em nova aba</a></p>` : `<img src="${escapeAttribute(url)}" alt="Documento assinado"><p><a href="${escapeAttribute(url)}" target="_blank" rel="noopener">Abrir imagem em nova aba</a></p>`;
+  modal.style.display="flex";
+}
+
+function fechar(){
+  document.getElementById("modal").style.display = "none";
+  document.getElementById("arquivoVisual").innerHTML = "";
+}
+
+function limparBusca(){
+  document.getElementById("search").value = "";
+  document.getElementById("result").innerHTML = `
+    <div class="result-placeholder">
+      <div class="big-icon">▣</div>
+      <div>
+        <h2>Resultado da consulta</h2>
+        <p>Pesquise um número de mobile para ver os detalhes da entrega.</p>
+      </div>
+    </div>`;
+  atualizarDetalhes(null);
+  atual = null;
+}
+
+function normalizarPulsus(valor){
+  return String(valor ?? "").trim().replace(/\s+/g," ");
+}
+
+function formatarData(data){
+  if(!data) return "-";
+  return new Date(data).toLocaleString("pt-BR");
+}
+
+function formatarTamanho(bytes){
+  if(bytes < 1024) return bytes + " B";
+  if(bytes < 1024*1024) return (bytes/1024).toFixed(1) + " KB";
+  return (bytes/(1024*1024)).toFixed(1) + " MB";
+}
+
+function escapeHtml(text){
+  return String(text ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
+
+function escapeAttribute(text){
+  return String(text ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/"/g,"&quot;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;");
+}
+
+function atualizarRelogio(){
+  const agora = new Date();
+  document.getElementById("currentDate").innerText =
+    agora.toLocaleDateString("pt-BR",{day:"numeric",month:"long",year:"numeric"});
+  document.getElementById("currentTime").innerText =
+    agora.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+}
+
+atualizarRelogio();
+setInterval(atualizarRelogio,1000);
+
+</script>
+</body></html>

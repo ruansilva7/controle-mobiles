@@ -1,0 +1,12 @@
+CONTROLE DE MOBILES — VERSÃO OFFLINE
+
+1. Instale Python 3 no computador.
+2. Abra o terminal nesta pasta.
+3. Execute: pip install -r requirements.txt
+4. Execute: python app.py
+5. Abra no navegador: http://127.0.0.1:5000
+
+O banco é o arquivo mobiles.db e os documentos ficam em static/uploads/.
+Não é necessário internet para usar depois que o Python e o Flask estiverem instalados.
+
+Para vários computadores na mesma rede, depois podemos adaptar o app para funcionar como servidor local e permitir acesso pelo IP do computador servidor.
